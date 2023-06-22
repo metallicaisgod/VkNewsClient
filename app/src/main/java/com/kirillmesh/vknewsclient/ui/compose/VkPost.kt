@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,7 +51,7 @@ fun VkPostCard() {
     ) {
         Column(modifier = Modifier.padding(2.dp)) {
             PostHeader()
-            Text(text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vel augue ex. In mattis turpis neque, sit amet tempus ligula viverra non. Nam egestas nibh id nibh imperdiet tincidunt.")
+            Text(text = stringResource(R.string.test_text))
             Image(
                 painter = painterResource(id = R.drawable.post_content_image),
                 contentDescription = null,
@@ -88,6 +89,23 @@ private fun Statistic() {
             PostStatistic(11, R.drawable.ic_comment)
             PostStatistic(463, R.drawable.ic_like)
         }
+    }
+}
+
+@Composable
+private fun PostStatistic(count: Int, resId: Int) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = count.toString(),
+            fontFamily = RalewayFontFamily,
+            fontWeight = FontWeight.Bold,
+            color = Color.Gray
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Image(
+            painter = painterResource(id = resId),
+            contentDescription = null
+        )
     }
 }
 
@@ -131,24 +149,6 @@ private fun PostHeader() {
 //
 //                }
     }
-}
-
-@Composable
-private fun PostStatistic(count: Int, resId: Int) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = count.toString(),
-            fontFamily = RalewayFontFamily,
-            fontWeight = FontWeight.Bold,
-            color = Color.Gray
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Image(
-            painter = painterResource(id = resId),
-            contentDescription = null
-        )
-    }
-
 }
 
 @Preview

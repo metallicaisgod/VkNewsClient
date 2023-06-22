@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">VkNewsClient</string>
+    <string name="test_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vel augue ex. In mattis turpis neque, sit amet tempus ligula viverra non. Nam egestas nibh id nibh imperdiet tincidunt.</string>
+    <string name="navigation_item_main">Main</string>
+    <string name="navigation_item_favorite">Favorite</string>
+    <string name="navigation_item_profile">Profile</string>
 </resources>
