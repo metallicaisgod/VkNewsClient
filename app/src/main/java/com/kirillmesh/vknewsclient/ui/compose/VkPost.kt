@@ -2,13 +2,13 @@ package com.kirillmesh.vknewsclient.ui.compose
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,152 +28,168 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kirillmesh.vknewsclient.R
+import com.kirillmesh.vknewsclient.domain.FeedPost
+import com.kirillmesh.vknewsclient.domain.StatisticElement
+import com.kirillmesh.vknewsclient.domain.StatisticType
 import com.kirillmesh.vknewsclient.ui.theme.RalewayFontFamily
-import com.kirillmesh.vknewsclient.ui.theme.VkNewsClientTheme
 
 
 @Composable
-fun VkPostCard() {
+fun VkPostCard(
+    modifier: Modifier = Modifier,
+    feedPost: FeedPost,
+    onStatisticItemClickListener: (StatisticType) -> Unit
+) {
     Card(
-            shape = RoundedCornerShape(4.dp),
-            border = BorderStroke(0.5.dp, Color.Gray),
-            colors = cardColors(containerColor = MaterialTheme.colorScheme.background)
+        modifier = modifier,
+        shape = RoundedCornerShape(4.dp),
+        border = BorderStroke(0.5.dp, Color.Gray),
+        colors = cardColors(containerColor = MaterialTheme.colorScheme.background)
     ) {
         Column(modifier = Modifier.padding(2.dp)) {
-            PostHeader()
-            Text(text = stringResource(R.string.test_text))
+            PostHeader(feedPost)
+            Text(text = feedPost.contentText)
             Image(
-                    painter = painterResource(id = R.drawable.post_content_image),
-                    contentDescription = null,
-                    modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 2.dp, bottom = 2.dp),
-                    contentScale = ContentScale.FillWidth
+                painter = painterResource(id = feedPost.contentImageResId),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(top = 2.dp, bottom = 2.dp),
+                contentScale = ContentScale.FillWidth
             )
-            Statistic()
+            Statistic(statistics = feedPost.statistics) {
+                onStatisticItemClickListener(it)
+            }
         }
     }
 }
 
 @Composable
-private fun Statistic() {
+private fun Statistic(
+    statistics: List<StatisticElement>,
+    onItemClickListener: (StatisticType) -> Unit
+) {
     Row(
-            modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp, bottom = 6.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp, bottom = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
 
         Row(
-                modifier = Modifier.weight(1f),
-
-                ) {
-            PostStatistic(206, R.drawable.ic_eye)
+            modifier = Modifier.weight(1f),
+        ) {
+            val viewsElement = statistics.getElementByType(StatisticType.VIEWS)
+            PostStatistic(
+                viewsElement.count,
+                R.drawable.ic_eye
+            ) {
+                onItemClickListener(StatisticType.VIEWS)
+            }
         }
         Row(
-                modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            PostStatistic(203, R.drawable.ic_share)
-            PostStatistic(11, R.drawable.ic_comment)
-            PostStatistic(463, R.drawable.ic_like)
+            val sharesElement = statistics.getElementByType(StatisticType.SHARES)
+            PostStatistic(
+                sharesElement.count,
+                R.drawable.ic_share
+            ) {
+                onItemClickListener(StatisticType.SHARES)
+            }
+            val commentsElement = statistics.getElementByType(StatisticType.COMMENTS)
+            PostStatistic(
+                commentsElement.count,
+                R.drawable.ic_comment
+            ) {
+                onItemClickListener(StatisticType.COMMENTS)
+            }
+            val likesElement = statistics.getElementByType(StatisticType.LIKES)
+            PostStatistic(
+                likesElement.count,
+                R.drawable.ic_like
+            ) {
+                onItemClickListener(StatisticType.LIKES)
+            }
         }
     }
 }
 
+private fun List<StatisticElement>.getElementByType(type: StatisticType): StatisticElement {
+    return this.find { it.type == type }
+        ?: throw IllegalStateException("getElementByType exited -1")
+}
+
 @Composable
-private fun PostStatistic(count: Int, resId: Int) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+private fun PostStatistic(
+    count: Int,
+    resId: Int,
+    onItemClickListener: () -> Unit
+) {
+    Row(
+        modifier = Modifier.clickable { onItemClickListener() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
-                text = count.toString(),
-                fontFamily = RalewayFontFamily,
-                fontWeight = FontWeight.Bold,
-                color = Color.Gray
+            text = count.toString(),
+            fontFamily = RalewayFontFamily,
+            fontWeight = FontWeight.Bold,
+            color = Color.Gray
         )
         Spacer(modifier = Modifier.width(4.dp))
         Image(
-                painter = painterResource(id = resId),
-                contentDescription = null
+            painter = painterResource(id = resId),
+            contentDescription = null
         )
     }
 }
 
 @Composable
-private fun PostHeader() {
+private fun PostHeader(
+    feedPost: FeedPost
+) {
     Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-                painter = painterResource(id = R.drawable.post_comunity_thumbnail),
-                contentDescription = "",
-                modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
+            painter = painterResource(id = feedPost.avatarResId),
+            contentDescription = "",
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
         )
         Column(
-                modifier = Modifier
-                        .padding(start = 4.dp)
-                        .weight(1f)
+            modifier = Modifier
+                .padding(start = 4.dp)
+                .weight(1f)
         ) {
             Text(
-                    "Group name",
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
+                feedPost.communityName,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
-                    "14:00",
-                    color = Color.Gray
+                feedPost.publicationData,
+                color = Color.Gray
             )
 
         }
 //                IconButton(onClick = { }) {
         Icon(
-                Icons.Default.MoreVert,
-                contentDescription = null,
-                tint = Color.Gray
+            Icons.Default.MoreVert,
+            contentDescription = null,
+            tint = Color.Gray
         )
 //                }
 //                DropdownMenu(expanded = false, onDismissRequest = { }) {
 //
 //                }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewCardLight() {
-    VkNewsClientTheme(
-            darkTheme = false
-    ) {
-        PostCardInBox()
-    }
-}
-
-@Preview
-@Composable
-fun PreviewCardDark() {
-    VkNewsClientTheme(
-            darkTheme = true
-    ) {
-        PostCardInBox()
-    }
-}
-
-@Composable
-private fun PostCardInBox() {
-    Box(
-            modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(4.dp)
-    ) {
-        VkPostCard()
     }
 }
