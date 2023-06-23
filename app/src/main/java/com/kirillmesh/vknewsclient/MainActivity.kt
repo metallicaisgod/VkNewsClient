@@ -52,8 +52,8 @@ class MainActivity : ComponentActivity() {
 //                        .background(MaterialTheme.colorScheme.primary)
 //                        .padding(4.dp)
 //                ) {
-                    MainScreen()
- //               }
+                MainScreen()
+                //               }
             }
         }
     }
@@ -63,47 +63,47 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun Test() {
     ModalNavigationDrawer(
-        drawerContent = {
-            Column() {
-                Text("Action 1")
-                Text("Action 2")
-                Text("Action 3")
-            }
-        }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(text = "TopAppBar title")
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = {}) {
-                            Icon(Icons.Filled.Menu, contentDescription = null)
-                        }
-                    }
-
-                )
-            },
-            bottomBar = {
-                var selectedItem by remember { mutableStateOf(0) }
-                val items = listOf("Songs", "Artists", "Playlists")
-                NavigationBar() {
-                    items.forEachIndexed { index, item ->
-                        NavigationBarItem(
-                            icon = { Icon(Icons.Filled.Favorite, contentDescription = item) },
-                            label = { Text(item) },
-                            selected = selectedItem == index,
-                            onClick = { selectedItem = index }
-                        )
-                    }
-
+            drawerContent = {
+                Column() {
+                    Text("Action 1")
+                    Text("Action 2")
+                    Text("Action 3")
                 }
             }
+    ) {
+        Scaffold(
+                topBar = {
+                    TopAppBar(
+                            title = {
+                                Text(text = "TopAppBar title")
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = {}) {
+                                    Icon(Icons.Filled.Menu, contentDescription = null)
+                                }
+                            }
+
+                    )
+                },
+                bottomBar = {
+                    var selectedItem by remember { mutableStateOf(0) }
+                    val items = listOf("Songs", "Artists", "Playlists")
+                    NavigationBar() {
+                        items.forEachIndexed { index, item ->
+                            NavigationBarItem(
+                                    icon = { Icon(Icons.Filled.Favorite, contentDescription = item) },
+                                    label = { Text(item) },
+                                    selected = selectedItem == index,
+                                    onClick = { selectedItem = index }
+                            )
+                        }
+
+                    }
+                }
         ) {
             Text(
-                text = "This is scaffold content",
-                modifier = Modifier.padding(it)
+                    text = "This is scaffold content",
+                    modifier = Modifier.padding(it)
             )
         }
     }
