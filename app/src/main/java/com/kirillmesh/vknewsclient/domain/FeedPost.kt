@@ -3,6 +3,7 @@ package com.kirillmesh.vknewsclient.domain
 import com.kirillmesh.vknewsclient.R
 
 data class FeedPost(
+    val id: Int,
     val communityName: String = "GroupName",
     val publicationData: String = "14:00",
     val avatarResId: Int = R.drawable.post_comunity_thumbnail,

@@ -8,21 +8,39 @@ import com.kirillmesh.vknewsclient.domain.StatisticType
 
 class MainViewModel : ViewModel() {
 
-    private val _feedPost = MutableLiveData(FeedPost())
-    val feedPost: LiveData<FeedPost> = _feedPost
+    private val postList = mutableListOf<FeedPost>().apply {
+        repeat(10){
+            add(FeedPost(id = it, communityName = "Group Name $it"))
+        }
+    }
 
-    fun updateStatistic(type: StatisticType) {
+    private val _feedPosts = MutableLiveData<List<FeedPost>>(postList)
+    val feedPosts: LiveData<List<FeedPost>> = _feedPosts
 
-        val oldStatistics = feedPost.value?.statistics ?: throw IllegalStateException()
-        val newStatistics = oldStatistics.toMutableList().apply {
-            replaceAll {
-                if (it.type == type) {
-                    it.copy(count = it.count + 1)
-                } else {
-                    it
+    fun updateStatistic(post: FeedPost, type: StatisticType) {
+        val modifiedList = _feedPosts.value?.toMutableList() ?: throw IllegalStateException()
+        modifiedList.replaceAll{
+            if(it == post) {
+                val newStatistics = it.statistics.toMutableList().apply {
+                    replaceAll { statisticElement ->
+                        if (statisticElement.type == type) {
+                            statisticElement.copy(count = statisticElement.count + 1)
+                        } else {
+                            statisticElement
+                        }
+                    }
                 }
+                it.copy(statistics = newStatistics)
+            } else {
+                it
             }
         }
-        _feedPost.value = feedPost.value?.copy(statistics = newStatistics)
+        _feedPosts.value = modifiedList
+    }
+
+    fun removePost(post: FeedPost) {
+        val modifiedList = _feedPosts.value?.toMutableList() ?: throw IllegalStateException()
+        modifiedList.remove(post)
+        _feedPosts.value = modifiedList
     }
 }
