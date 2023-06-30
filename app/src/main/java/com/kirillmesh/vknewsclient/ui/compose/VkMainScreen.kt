@@ -11,21 +11,23 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kirillmesh.vknewsclient.MainViewModel
 import com.kirillmesh.vknewsclient.domain.FeedPost
+import com.kirillmesh.vknewsclient.domain.StatisticType
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    viewModel: MainViewModel
+) {
 
-    val feedPost = remember {
-        mutableStateOf(FeedPost())
-    }
 
     Scaffold(
         bottomBar = {
@@ -64,21 +66,14 @@ fun MainScreen() {
             }
         }
     ) {
+        val feedPost = viewModel.feedPost.observeAsState(initial = FeedPost())
         VkPostCard(
             modifier = Modifier.padding(8.dp),
-            feedPost = feedPost.value
-        ) { type ->
-            val newStatistics =
-                feedPost.value.statistics.toMutableList().apply {
-                    replaceAll {
-                        if (it.type == type) {
-                            it.copy(count = it.count + 1)
-                        } else {
-                            it
-                        }
-                    }
-                }
-            feedPost.value = feedPost.value.copy(statistics = newStatistics)
-        }
+            feedPost = feedPost.value,
+            onStatisticViewsClickListener = { viewModel.updateStatistic(StatisticType.VIEWS) },
+            onStatisticSharesClickListener = { viewModel.updateStatistic(StatisticType.SHARES) },
+            onStatisticCommentsClickListener = { viewModel.updateStatistic(StatisticType.COMMENTS) },
+            onStatisticLikesClickListener = { viewModel.updateStatistic(StatisticType.LIKES) },
+        )
     }
 }

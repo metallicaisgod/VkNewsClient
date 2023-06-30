@@ -41,7 +41,10 @@ import com.kirillmesh.vknewsclient.ui.theme.RalewayFontFamily
 fun VkPostCard(
     modifier: Modifier = Modifier,
     feedPost: FeedPost,
-    onStatisticItemClickListener: (StatisticType) -> Unit
+    onStatisticViewsClickListener: () -> Unit,
+    onStatisticSharesClickListener: () -> Unit,
+    onStatisticCommentsClickListener: () -> Unit,
+    onStatisticLikesClickListener: () -> Unit
 ) {
     Card(
         modifier = modifier,
@@ -61,9 +64,13 @@ fun VkPostCard(
                     .padding(top = 2.dp, bottom = 2.dp),
                 contentScale = ContentScale.FillWidth
             )
-            Statistic(statistics = feedPost.statistics) {
-                onStatisticItemClickListener(it)
-            }
+            Statistic(
+                statistics = feedPost.statistics,
+                onStatisticViewsClickListener = onStatisticViewsClickListener,
+                onStatisticSharesClickListener = onStatisticSharesClickListener,
+                onStatisticCommentsClickListener = onStatisticCommentsClickListener,
+                onStatisticLikesClickListener = onStatisticLikesClickListener
+            )
         }
     }
 }
@@ -71,7 +78,10 @@ fun VkPostCard(
 @Composable
 private fun Statistic(
     statistics: List<StatisticElement>,
-    onItemClickListener: (StatisticType) -> Unit
+    onStatisticViewsClickListener: () -> Unit,
+    onStatisticSharesClickListener: () -> Unit,
+    onStatisticCommentsClickListener: () -> Unit,
+    onStatisticLikesClickListener: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -89,7 +99,7 @@ private fun Statistic(
                 viewsElement.count,
                 R.drawable.ic_eye
             ) {
-                onItemClickListener(StatisticType.VIEWS)
+                onStatisticViewsClickListener()
             }
         }
         Row(
@@ -101,21 +111,21 @@ private fun Statistic(
                 sharesElement.count,
                 R.drawable.ic_share
             ) {
-                onItemClickListener(StatisticType.SHARES)
+                onStatisticSharesClickListener()
             }
             val commentsElement = statistics.getElementByType(StatisticType.COMMENTS)
             PostStatistic(
                 commentsElement.count,
                 R.drawable.ic_comment
             ) {
-                onItemClickListener(StatisticType.COMMENTS)
+                onStatisticCommentsClickListener()
             }
             val likesElement = statistics.getElementByType(StatisticType.LIKES)
             PostStatistic(
                 likesElement.count,
                 R.drawable.ic_like
             ) {
-                onItemClickListener(StatisticType.LIKES)
+                onStatisticLikesClickListener()
             }
         }
     }
