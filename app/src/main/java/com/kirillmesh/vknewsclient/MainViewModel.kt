@@ -9,7 +9,7 @@ import com.kirillmesh.vknewsclient.domain.StatisticType
 class MainViewModel : ViewModel() {
 
     private val postList = mutableListOf<FeedPost>().apply {
-        repeat(10){
+        repeat(10) {
             add(FeedPost(id = it, communityName = "Group Name $it"))
         }
     }
@@ -19,8 +19,8 @@ class MainViewModel : ViewModel() {
 
     fun updateStatistic(post: FeedPost, type: StatisticType) {
         val modifiedList = _feedPosts.value?.toMutableList() ?: throw IllegalStateException()
-        modifiedList.replaceAll{
-            if(it == post) {
+        modifiedList.replaceAll {
+            if (it == post) {
                 val newStatistics = it.statistics.toMutableList().apply {
                     replaceAll { statisticElement ->
                         if (statisticElement.type == type) {
