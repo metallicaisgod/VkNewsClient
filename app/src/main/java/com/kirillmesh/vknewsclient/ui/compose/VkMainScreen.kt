@@ -16,20 +16,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.kirillmesh.vknewsclient.MainViewModel
 import com.kirillmesh.vknewsclient.ui.navigation.AppNavGraph
-import com.kirillmesh.vknewsclient.ui.navigation.Screen
+import com.kirillmesh.vknewsclient.ui.navigation.rememberNavigationState
 
 @Composable
 fun MainScreen(
     viewModel: MainViewModel
 ) {
-    val navHostController = rememberNavController()
+    val navigationState = rememberNavigationState()
+
     Scaffold(
         bottomBar = {
             BottomAppBar {
-                val navBackStackEntry by navHostController.currentBackStackEntryAsState()
+                val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 val items = listOf(
@@ -40,15 +40,7 @@ fun MainScreen(
                 items.forEach { navigationItem ->
                     BottomNavigationItem(
                         selected = currentRoute == navigationItem.screen.route,
-                        onClick = {
-                            navHostController.navigate(navigationItem.screen.route) {
-                                popUpTo(Screen.NewsFeed.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
+                        onClick = { navigationState.navigateTo(navigationItem.screen.route) },
                         icon = {
                             Icon(navigationItem.icon, contentDescription = null)
                         },
@@ -64,7 +56,7 @@ fun MainScreen(
         }
     ) { paddingValues ->
         AppNavGraph(
-            navController = navHostController,
+            navController = navigationState.navHostController,
             homeScreenNavigation = {
                 HomeScreen(
                     viewModel = viewModel,

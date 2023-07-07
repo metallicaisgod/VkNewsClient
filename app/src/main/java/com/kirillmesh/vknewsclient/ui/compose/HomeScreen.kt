@@ -25,6 +25,16 @@ fun HomeScreen(
 ) {
     val feedPosts = viewModel.feedPosts.observeAsState(listOf())
 
+
+//    if(feedPosts.value.isNotEmpty()) {
+//        val comments = mutableListOf<Comment>().apply {
+//            repeat(20){
+//                add(Comment(id = it))
+//            }
+//        }
+//        CommentsScreen(feedPost = feedPosts.value.get(0), comments = comments)
+//    }
+
     LazyColumn(
         modifier = Modifier.padding(paddingValues),
         contentPadding = PaddingValues(
