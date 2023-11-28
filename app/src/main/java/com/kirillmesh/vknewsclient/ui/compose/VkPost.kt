@@ -2,15 +2,7 @@ package com.kirillmesh.vknewsclient.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
@@ -41,7 +33,7 @@ fun VkPostCard(
     onStatisticViewsClickListener: () -> Unit,
     onStatisticSharesClickListener: () -> Unit,
     onStatisticCommentsClickListener: () -> Unit,
-    onStatisticLikesClickListener: () -> Unit
+    onStatisticLikesClickListener: () -> Unit,
 ) {
     Card(
         modifier = modifier,
@@ -78,7 +70,7 @@ private fun Statistic(
     onStatisticViewsClickListener: () -> Unit,
     onStatisticSharesClickListener: () -> Unit,
     onStatisticCommentsClickListener: () -> Unit,
-    onStatisticLikesClickListener: () -> Unit
+    onStatisticLikesClickListener: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -137,7 +129,7 @@ private fun List<StatisticElement>.getElementByType(type: StatisticType): Statis
 private fun PostStatistic(
     count: Int,
     resId: Int,
-    onItemClickListener: () -> Unit
+    onItemClickListener: () -> Unit,
 ) {
     Row(
         modifier = Modifier.clickable { onItemClickListener() },
@@ -159,7 +151,7 @@ private fun PostStatistic(
 
 @Composable
 private fun PostHeader(
-    feedPost: FeedPost
+    feedPost: FeedPost,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),

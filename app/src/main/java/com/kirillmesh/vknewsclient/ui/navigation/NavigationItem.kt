@@ -1,4 +1,4 @@
-package com.kirillmesh.vknewsclient.ui.compose
+package com.kirillmesh.vknewsclient.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
@@ -6,16 +6,15 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.kirillmesh.vknewsclient.R
-import com.kirillmesh.vknewsclient.ui.navigation.Screen
 
-sealed class NavigationItem (
+sealed class NavigationItem(
     val screen: Screen,
     val textRexId: Int,
-    val icon: ImageVector
-){
+    val icon: ImageVector,
+) {
 
     object Home : NavigationItem(
-        screen = Screen.NewsFeed,
+        screen = Screen.Home,
         textRexId = R.string.navigation_item_main,
         icon = Icons.Outlined.Home
     )

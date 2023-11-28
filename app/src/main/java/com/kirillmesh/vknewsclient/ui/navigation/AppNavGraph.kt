@@ -4,21 +4,26 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.kirillmesh.vknewsclient.domain.FeedPost
 
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    homeScreenNavigation: @Composable () -> Unit,
+    newsFeedScreenNavigation: @Composable () -> Unit,
     favouriteScreenNavigation: @Composable () -> Unit,
-    profileScreenNavigation: @Composable () -> Unit
+    profileScreenNavigation: @Composable () -> Unit,
+    commentsScreenNavigation: @Composable (FeedPost) -> Unit,
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.NewsFeed.route
+        startDestination = Screen.Home.route
     ) {
-        composable(Screen.NewsFeed.route) {
-            homeScreenNavigation()
-        }
+
+        homeScreenNavGraph(
+            newsFeedScreenNavigation = newsFeedScreenNavigation,
+            commentsScreenNavigation = commentsScreenNavigation
+        )
+
         composable(Screen.Favourite.route) {
             favouriteScreenNavigation()
         }

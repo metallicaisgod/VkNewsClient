@@ -3,7 +3,6 @@ package com.kirillmesh.vknewsclient
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.material.MaterialTheme
 import com.kirillmesh.vknewsclient.ui.compose.MainScreen
 import com.kirillmesh.vknewsclient.ui.compose.SetStatusBarColor
@@ -11,7 +10,6 @@ import com.kirillmesh.vknewsclient.ui.theme.VkNewsClientTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel by viewModels<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -24,7 +22,7 @@ class MainActivity : ComponentActivity() {
 //                        .background(MaterialTheme.colorScheme.primary)
 //                        .padding(4.dp)
 //                ) {
-                MainScreen(viewModel)
+                MainScreen()
                 //               }
             }
         }
