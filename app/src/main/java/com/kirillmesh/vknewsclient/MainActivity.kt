@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
+import com.kirillmesh.vknewsclient.ui.compose.ActivityResultTest
 import com.kirillmesh.vknewsclient.ui.compose.MainScreen
 import com.kirillmesh.vknewsclient.ui.compose.SetStatusBarColor
 import com.kirillmesh.vknewsclient.ui.theme.VkNewsClientTheme
@@ -22,7 +23,8 @@ class MainActivity : ComponentActivity() {
 //                        .background(MaterialTheme.colorScheme.primary)
 //                        .padding(4.dp)
 //                ) {
-                MainScreen()
+//                MainScreen()
+                ActivityResultTest()
                 //               }
             }
         }
