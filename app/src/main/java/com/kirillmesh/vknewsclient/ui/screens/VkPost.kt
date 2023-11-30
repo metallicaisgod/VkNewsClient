@@ -19,6 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.kirillmesh.vknewsclient.R
 import com.kirillmesh.vknewsclient.domain.FeedPost
 import com.kirillmesh.vknewsclient.domain.StatisticElement
@@ -44,13 +45,13 @@ fun VkPostCard(
         Column(modifier = Modifier.padding(2.dp)) {
             PostHeader(feedPost)
             Text(text = feedPost.contentText, color = MaterialTheme.colors.onBackground)
-            Image(
-                painter = painterResource(id = feedPost.contentImageResId),
+            AsyncImage(
+                model = feedPost.contentImageUrl,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(top = 2.dp, bottom = 2.dp),
+                    .padding(top = 2.dp, bottom = 2.dp)
+                    .wrapContentHeight(),
                 contentScale = ContentScale.FillWidth
             )
             Statistic(
@@ -127,7 +128,7 @@ private fun List<StatisticElement>.getElementByType(type: StatisticType): Statis
 
 @Composable
 private fun PostStatistic(
-    count: Int,
+    count: Long,
     resId: Int,
     onItemClickListener: () -> Unit,
 ) {
@@ -157,8 +158,8 @@ private fun PostHeader(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = feedPost.avatarResId),
+        AsyncImage(
+            model = feedPost.communityAvatarUrl,
             contentDescription = "",
             modifier = Modifier
                 .size(40.dp)

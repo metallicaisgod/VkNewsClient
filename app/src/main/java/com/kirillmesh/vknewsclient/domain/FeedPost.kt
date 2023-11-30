@@ -5,23 +5,17 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.navigation.NavType
 import com.google.gson.Gson
-import com.kirillmesh.vknewsclient.R
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FeedPost(
-    val id: Int,
-    val communityName: String = "GroupName",
-    val publicationData: String = "14:00",
-    val avatarResId: Int = R.drawable.post_comunity_thumbnail,
-    val contentText: String = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    val contentImageResId: Int = R.drawable.post_content_image,
-    val statistics: List<StatisticElement> = listOf(
-        StatisticElement(StatisticType.VIEWS, 966),
-        StatisticElement(StatisticType.SHARES, 203),
-        StatisticElement(StatisticType.COMMENTS, 11),
-        StatisticElement(StatisticType.LIKES, 463),
-    ),
+    val id: String,
+    val communityName: String,
+    val publicationData: String,
+    val communityAvatarUrl: String,
+    val contentText: String,
+    val contentImageUrl: String?,
+    val statistics: List<StatisticElement>,
 ) : Parcelable {
 
     companion object {
