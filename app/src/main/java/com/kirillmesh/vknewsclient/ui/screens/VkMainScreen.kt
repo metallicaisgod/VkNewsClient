@@ -1,4 +1,4 @@
-package com.kirillmesh.vknewsclient.ui.compose
+package com.kirillmesh.vknewsclient.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -61,7 +61,7 @@ fun MainScreen() {
         AppNavGraph(
             navController = navigationState.navHostController,
             newsFeedScreenNavigation = {
-                HomeScreen(
+                FeedPostsScreen(
                     paddingValues = paddingValues
                 ) {
                     navigationState.navigateToComments(it)

@@ -1,4 +1,4 @@
-package com.kirillmesh.vknewsclient.ui.compose
+package com.kirillmesh.vknewsclient.ui.screens
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -9,7 +9,7 @@ import com.kirillmesh.vknewsclient.ui.states.FeedPostsScreenState
 import com.kirillmesh.vknewsclient.ui.viewmodels.FeedPostsViewModel
 
 @Composable
-fun HomeScreen(
+fun FeedPostsScreen(
     paddingValues: PaddingValues,
     onCommentsClickListener: (FeedPost) -> Unit,
 ) {

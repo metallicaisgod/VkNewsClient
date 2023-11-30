@@ -1,4 +1,4 @@
-package com.kirillmesh.vknewsclient.ui.compose
+package com.kirillmesh.vknewsclient.ui.screens
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -44,7 +44,7 @@ fun ActivityResultTest() {
                 .fillMaxWidth()
                 .wrapContentHeight(),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Black,
+                backgroundColor = Color.Blue,
                 contentColor = Color.White
             ),
             onClick = { launcher.launch("image/*") }) {

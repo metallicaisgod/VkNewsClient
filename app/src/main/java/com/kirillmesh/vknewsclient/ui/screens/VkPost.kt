@@ -1,4 +1,4 @@
-package com.kirillmesh.vknewsclient.ui.compose
+package com.kirillmesh.vknewsclient.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

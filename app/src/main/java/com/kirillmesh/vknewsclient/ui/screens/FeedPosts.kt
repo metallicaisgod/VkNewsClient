@@ -1,4 +1,4 @@
-package com.kirillmesh.vknewsclient.ui.compose
+package com.kirillmesh.vknewsclient.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
