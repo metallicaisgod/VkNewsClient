@@ -6,12 +6,12 @@ import com.vk.api.sdk.auth.VKAccessToken
 
 class TokenManager(val application: Application) {
 
-    fun getToken(): String? {
+    fun getToken(): String {
         val storage = VKPreferencesKeyValueStorage(application)
         val token = VKAccessToken.restore(storage)
         if(token != null && token.isValid) {
             return token.accessToken
         }
-        return null
+        throw java.lang.RuntimeException("token is null")
     }
 }

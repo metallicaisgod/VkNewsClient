@@ -3,6 +3,7 @@ package com.kirillmesh.vknewsclient.data.network
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 
 object NetworkObject {
@@ -24,6 +25,7 @@ object NetworkObject {
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://api.vk.ru/method/")
+        .addConverterFactory(GsonConverterFactory.create())
         .client(okHttpClient)
         .build()
 

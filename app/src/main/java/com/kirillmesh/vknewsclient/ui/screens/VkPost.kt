@@ -44,7 +44,7 @@ fun VkPostCard(
     ) {
         Column(modifier = Modifier.padding(2.dp)) {
             PostHeader(feedPost)
-            Text(text = feedPost.contentText, color = MaterialTheme.colors.onBackground)
+            Text(text = feedPost.contentText ?: "", color = MaterialTheme.colors.onBackground)
             AsyncImage(
                 model = feedPost.contentImageUrl,
                 contentDescription = null,
@@ -59,7 +59,8 @@ fun VkPostCard(
                 onStatisticViewsClickListener = onStatisticViewsClickListener,
                 onStatisticSharesClickListener = onStatisticSharesClickListener,
                 onStatisticCommentsClickListener = onStatisticCommentsClickListener,
-                onStatisticLikesClickListener = onStatisticLikesClickListener
+                onStatisticLikesClickListener = onStatisticLikesClickListener,
+                feedPost.isLiked
             )
         }
     }
@@ -72,6 +73,7 @@ private fun Statistic(
     onStatisticSharesClickListener: () -> Unit,
     onStatisticCommentsClickListener: () -> Unit,
     onStatisticLikesClickListener: () -> Unit,
+    isFavourite: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -113,11 +115,21 @@ private fun Statistic(
             val likesElement = statistics.getElementByType(StatisticType.LIKES)
             PostStatistic(
                 likesElement.count,
-                R.drawable.ic_like
+                if(!isFavourite) R.drawable.ic_like else R.drawable.ic_like_set
             ) {
                 onStatisticLikesClickListener()
             }
         }
+    }
+}
+
+fun Long.mapToString(): String {
+    return if (this > 100_000){
+        String.format("%sK", (this/1000))
+    } else if(this > 1000){
+        String.format("%.1fK", (this/1000f))
+    } else {
+        this.toString()
     }
 }
 
@@ -137,13 +149,14 @@ private fun PostStatistic(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = count.toString(),
+            text = count.mapToString(),
             fontFamily = RalewayFontFamily,
             fontWeight = FontWeight.Bold,
             color = Color.Gray
         )
         Spacer(modifier = Modifier.width(4.dp))
         Image(
+            modifier  = Modifier.size(20.dp),
             painter = painterResource(id = resId),
             contentDescription = null
         )

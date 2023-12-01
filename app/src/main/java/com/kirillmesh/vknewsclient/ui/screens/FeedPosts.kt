@@ -35,12 +35,13 @@ fun FeedPosts(
         ),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(items = feedPosts, key = { post -> post.id }) { feedPost ->
+        items(items = feedPosts, key = { post ->
+            post.id
+        }) { feedPost ->
             val dismissState = rememberDismissState()
             if (dismissState.isDismissed(DismissDirection.EndToStart)) {
                 viewModel.removePost(feedPost)
             }
-
             SwipeToDismiss(
                 modifier = Modifier.animateItemPlacement(),
                 state = dismissState,
@@ -65,10 +66,7 @@ fun FeedPosts(
                             onCommentsClickListener(feedPost)
                         },
                         onStatisticLikesClickListener = {
-                            viewModel.updateStatistic(
-                                feedPost,
-                                StatisticType.LIKES
-                            )
+                            viewModel.changeLikesCount(feedPost)
                         }
                     )
                 }

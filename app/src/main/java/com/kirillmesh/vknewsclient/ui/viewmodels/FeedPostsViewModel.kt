@@ -2,8 +2,7 @@ package com.kirillmesh.vknewsclient.ui.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.kirillmesh.vknewsclient.data.network.NetworkObject
-import com.kirillmesh.vknewsclient.data.sharedprefs.TokenManager
+import com.kirillmesh.vknewsclient.data.repository.NewsFeedRepository
 import com.kirillmesh.vknewsclient.domain.FeedPost
 import com.kirillmesh.vknewsclient.domain.StatisticType
 import com.kirillmesh.vknewsclient.ui.states.FeedPostsScreenState
@@ -16,17 +15,27 @@ class FeedPostsViewModel(application: Application) : AndroidViewModel(applicatio
     private val _screenState = MutableLiveData<FeedPostsScreenState>(startState)
     val screenState: LiveData<FeedPostsScreenState> = _screenState
 
+    private val repository = NewsFeedRepository(application)
+
     init {
         loadNewsFeed()
     }
 
     private fun loadNewsFeed() {
         viewModelScope.launch {
-            val token = TokenManager(application = getApplication()).getToken()
-            if(token != null) {
-                val posts = NetworkObject.apiService.loadNewsFeed(token).response.mapToDomain()
-                _screenState.value = FeedPostsScreenState.Posts(posts)
+            val posts = repository.loadNewsFeed()
+            _screenState.value = FeedPostsScreenState.Posts(posts)
+        }
+    }
+
+    fun changeLikesCount(feedPost: FeedPost) {
+        viewModelScope.launch {
+            if(!feedPost.isLiked) {
+                repository.addLike(feedPost)
+            } else {
+                repository.deleteLike(feedPost)
             }
+            _screenState.value = FeedPostsScreenState.Posts(repository.feedPosts)
         }
     }
 
