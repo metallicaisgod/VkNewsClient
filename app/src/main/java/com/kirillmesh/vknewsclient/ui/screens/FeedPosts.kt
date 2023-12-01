@@ -1,20 +1,18 @@
 package com.kirillmesh.vknewsclient.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.DismissDirection
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.SwipeToDismiss
-import androidx.compose.material.rememberDismissState
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kirillmesh.vknewsclient.domain.FeedPost
 import com.kirillmesh.vknewsclient.domain.StatisticType
+import com.kirillmesh.vknewsclient.ui.theme.DarkBlue
 import com.kirillmesh.vknewsclient.ui.viewmodels.FeedPostsViewModel
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
@@ -24,6 +22,7 @@ fun FeedPosts(
     paddingValues: PaddingValues,
     feedPosts: List<FeedPost>,
     onCommentsClickListener: (FeedPost) -> Unit,
+    isNextNewsFeedLoading: Boolean,
 ) {
     LazyColumn(
         modifier = Modifier.padding(paddingValues),
@@ -71,6 +70,23 @@ fun FeedPosts(
                     )
                 }
             )
+        }
+        item {
+            if (isNextNewsFeedLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = DarkBlue)
+                }
+            } else {
+                SideEffect {
+                    viewModel.loadNextNewsFeed()
+                }
+            }
         }
     }
 }

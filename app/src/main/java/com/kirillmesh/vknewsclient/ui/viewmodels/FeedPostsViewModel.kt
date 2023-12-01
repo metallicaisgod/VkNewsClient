@@ -28,13 +28,17 @@ class FeedPostsViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun loadNextNewsFeed(){
+        _screenState.value = FeedPostsScreenState.Posts(
+            posts = repository.feedPosts,
+            isNextNewsFeedLoading = true
+        )
+        loadNewsFeed()
+    }
+
     fun changeLikesCount(feedPost: FeedPost) {
         viewModelScope.launch {
-            if(!feedPost.isLiked) {
-                repository.addLike(feedPost)
-            } else {
-                repository.deleteLike(feedPost)
-            }
+            repository.changeLikesInPost(feedPost)
             _screenState.value = FeedPostsScreenState.Posts(repository.feedPosts)
         }
     }

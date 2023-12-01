@@ -10,6 +10,12 @@ interface ApiService {
     @GET("newsfeed.get")
     suspend fun loadNewsFeed(@Query("access_token") token: String): ResultDto
 
+    @GET("newsfeed.get")
+    suspend fun loadNewsFeed(
+        @Query("access_token") token: String,
+        @Query("start_from") startFrom: String,
+    ): ResultDto
+
     @GET("likes.add?type=post")
     suspend fun addLike(
         @Query("access_token") token: String,

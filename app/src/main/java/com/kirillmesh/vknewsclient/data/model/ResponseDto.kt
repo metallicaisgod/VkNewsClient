@@ -11,12 +11,14 @@ import kotlin.math.absoluteValue
 data class ResponseDto(
     @SerializedName("items") val posts: List<FeedPostDto>,
     @SerializedName("groups") val groups: List<GroupDto>,
+    @SerializedName("next_from") val nextFrom: String?,
 ) {
     fun mapToDomain(): List<FeedPost> {
         val result = mutableListOf<FeedPost>()
+        val idList = mutableListOf<Long>()
 
         for (post in posts) {
-            if(post.id == 0L) continue
+            if (post.id == 0L || idList.contains(post.id)) continue
             val group = groups.find { it.id == post.communityId.absoluteValue } ?: continue
 
 
@@ -36,7 +38,7 @@ data class ResponseDto(
                 ),
                 isLiked = ((post.likes?.userLikes ?: 0) > 0)
             )
-
+            idList.add(post.id)
             result.add(feedPost)
         }
         return result

@@ -22,7 +22,8 @@ fun FeedPostsScreen(
                 viewModel = viewModel,
                 paddingValues = paddingValues,
                 feedPosts = currentState.posts,
-                onCommentsClickListener = onCommentsClickListener
+                onCommentsClickListener = onCommentsClickListener,
+                isNextNewsFeedLoading = currentState.isNextNewsFeedLoading
             )
         }
         FeedPostsScreenState.Initial -> {}

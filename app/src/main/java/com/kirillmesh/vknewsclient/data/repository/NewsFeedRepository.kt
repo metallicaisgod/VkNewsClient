@@ -17,42 +17,45 @@ class NewsFeedRepository(application: Application) {
     val feedPosts: List<FeedPost>
         get() = _feedPosts.toList()
 
+    private var nextFrom: String?= null
+
     suspend fun loadNewsFeed(): List<FeedPost> {
-        val posts = api.loadNewsFeed(token).response.mapToDomain()
+        val startFrom = nextFrom
+        if(startFrom == null && feedPosts.isNotEmpty()) return feedPosts
+        val response = if(startFrom == null) {
+            api.loadNewsFeed(token).response
+        } else {
+            api.loadNewsFeed(token, startFrom).response
+        }
+        nextFrom = response.nextFrom
+        val posts = response.mapToDomain()
         _feedPosts.addAll(posts)
-        return posts
+        return feedPosts
     }
 
-    suspend fun addLike(feedPost: FeedPost) {
-        val response = api.addLike(
-            token,
-            feedPost.communityId,
-            feedPost.id
-        )
+    suspend fun changeLikesInPost(feedPost: FeedPost) {
+
+        val response = if(!feedPost.isLiked) {
+            api.addLike(
+                token,
+                feedPost.communityId,
+                feedPost.id
+            )
+        } else {
+            api.deleteLike(
+                token,
+                feedPost.communityId,
+                feedPost.id
+            )
+        }
 
         val newLikesCount = response.likes.count
-        changeLikesInPost(newLikesCount, feedPost, true)
-    }
-
-    suspend fun deleteLike(feedPost: FeedPost) {
-        val response = api.deleteLike(
-            token,
-            feedPost.communityId,
-            feedPost.id
-        )
-
-        val newLikesCount = response.likes.count
-        changeLikesInPost(newLikesCount, feedPost, false)
-    }
-
-    private fun changeLikesInPost(newLikesCount: Long, feedPost: FeedPost, isLiked: Boolean){
         val newStatistics = feedPost.statistics.toMutableList().apply {
             removeIf { it.type == StatisticType.LIKES }
             add(StatisticElement(type = StatisticType.LIKES, count = newLikesCount))
         }
-        val newPost = feedPost.copy(statistics = newStatistics, isLiked = isLiked)
+        val newPost = feedPost.copy(statistics = newStatistics, isLiked = !feedPost.isLiked)
         val postIndex = _feedPosts.indexOf(feedPost)
         _feedPosts[postIndex] = newPost
     }
-
 }
