@@ -1,15 +1,16 @@
 package com.kirillmesh.vknewsclient.data.repository
 
-import android.app.Application
+import android.content.Context
 import com.kirillmesh.vknewsclient.data.network.NetworkObject
 import com.kirillmesh.vknewsclient.data.sharedprefs.TokenManager
+import com.kirillmesh.vknewsclient.domain.Comment
 import com.kirillmesh.vknewsclient.domain.FeedPost
 import com.kirillmesh.vknewsclient.domain.StatisticElement
 import com.kirillmesh.vknewsclient.domain.StatisticType
 
-class NewsFeedRepository(application: Application) {
+class NewsFeedRepository(context: Context) {
 
-    private val token = TokenManager(application = application).getToken()
+    private val token = TokenManager(context = context).getToken()
 
     private val api = NetworkObject.apiService
 
@@ -17,12 +18,16 @@ class NewsFeedRepository(application: Application) {
     val feedPosts: List<FeedPost>
         get() = _feedPosts.toList()
 
-    private var nextFrom: String?= null
+    private var _comments = mutableListOf<Comment>()
+    val comments: List<Comment>
+        get() = _comments.toList()
+
+    private var nextFrom: String? = null
 
     suspend fun loadNewsFeed(): List<FeedPost> {
         val startFrom = nextFrom
-        if(startFrom == null && feedPosts.isNotEmpty()) return feedPosts
-        val response = if(startFrom == null) {
+        if (startFrom == null && feedPosts.isNotEmpty()) return feedPosts
+        val response = if (startFrom == null) {
             api.loadNewsFeed(token).response
         } else {
             api.loadNewsFeed(token, startFrom).response
@@ -35,7 +40,7 @@ class NewsFeedRepository(application: Application) {
 
     suspend fun changeLikesInPost(feedPost: FeedPost) {
 
-        val response = if(!feedPost.isLiked) {
+        val response = if (!feedPost.isLiked) {
             api.addLike(
                 token,
                 feedPost.communityId,
@@ -59,12 +64,22 @@ class NewsFeedRepository(application: Application) {
         _feedPosts[postIndex] = newPost
     }
 
-    suspend fun removePost(feedPost: FeedPost){
+    suspend fun removePost(feedPost: FeedPost) {
         api.removePost(
             token,
             feedPost.communityId,
             feedPost.id
         )
         _feedPosts.remove(feedPost)
+    }
+
+    suspend fun getComments(feedPost: FeedPost): List<Comment> {
+        val commentsTemp = api.getComments(
+            token = token,
+            ownerId = feedPost.communityId,
+            postId = feedPost.id
+        ).response.mapToDomain()
+        _comments.addAll(commentsTemp)
+        return comments
     }
 }

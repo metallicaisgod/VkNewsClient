@@ -43,11 +43,11 @@ data class ResponseDto(
         }
         return result
     }
+}
 
-    private fun Long.timestampToDate(): String {
-        val date = Date(this * 1000)
-        return SimpleDateFormat("d MMMM yyyy, hh:mm", Locale.getDefault()).format(date)
-    }
+fun Long.timestampToDate(): String {
+    val date = Date(this * 1000)
+    return SimpleDateFormat("d MMMM yyyy, hh:mm", Locale.getDefault()).format(date)
 }
 
 

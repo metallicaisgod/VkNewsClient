@@ -72,7 +72,7 @@ fun MainScreen() {
                     onBackPressedListener = { navigationState.navHostController.popBackStack() },
                     feedPost = feedPost
                 )
-                BackHandler() {
+                BackHandler {
                     navigationState.navHostController.popBackStack()
                 }
             },

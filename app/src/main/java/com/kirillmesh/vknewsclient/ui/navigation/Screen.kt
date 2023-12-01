@@ -35,6 +35,6 @@ sealed class Screen(
 
 }
 
-fun String.encode() : String {
+fun String.encode(): String {
     return Uri.encode(this)
 }

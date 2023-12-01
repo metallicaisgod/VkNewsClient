@@ -1,5 +1,6 @@
 package com.kirillmesh.vknewsclient.data.network
 
+import com.kirillmesh.vknewsclient.data.model.CommentsResultDto
 import com.kirillmesh.vknewsclient.data.model.ResponseLikesDto
 import com.kirillmesh.vknewsclient.data.model.ResultDto
 import retrofit2.http.GET
@@ -36,5 +37,12 @@ interface ApiService {
         @Query("owner_id") ownerId: Long,
         @Query("item_id") itemId: Long,
     )
+
+    @GET("wall.getComments?extended=1&fields=photo_100")
+    suspend fun getComments(
+        @Query("access_token") token: String,
+        @Query("owner_id") ownerId: Long,
+        @Query("post_id") postId: Long,
+    ): CommentsResultDto
 
 }

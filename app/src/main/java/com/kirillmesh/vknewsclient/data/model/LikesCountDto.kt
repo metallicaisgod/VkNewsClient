@@ -3,5 +3,5 @@ package com.kirillmesh.vknewsclient.data.model
 import com.google.gson.annotations.SerializedName
 
 data class LikesCountDto(
-    @SerializedName("likes") val count: Long
+    @SerializedName("likes") val count: Long,
 )

@@ -67,7 +67,7 @@ private fun Statistic(
     statistics: List<StatisticElement>,
     onStatisticCommentsClickListener: () -> Unit,
     onStatisticLikesClickListener: () -> Unit,
-    isFavourite: Boolean
+    isFavourite: Boolean,
 ) {
     Row(
         modifier = Modifier
@@ -105,7 +105,7 @@ private fun Statistic(
             val likesElement = statistics.getElementByType(StatisticType.LIKES)
             PostStatistic(
                 likesElement.count,
-                if(!isFavourite) R.drawable.ic_like else R.drawable.ic_like_set
+                if (!isFavourite) R.drawable.ic_like else R.drawable.ic_like_set
             ) {
                 onStatisticLikesClickListener()
             }
@@ -114,10 +114,10 @@ private fun Statistic(
 }
 
 fun Long.mapToString(): String {
-    return if (this > 100_000){
-        String.format("%sK", (this/1000))
-    } else if(this > 1000){
-        String.format("%.1fK", (this/1000f))
+    return if (this > 100_000) {
+        String.format("%sK", (this / 1000))
+    } else if (this > 1000) {
+        String.format("%.1fK", (this / 1000f))
     } else {
         this.toString()
     }
@@ -134,7 +134,7 @@ private fun PostStatistic(
     resId: Int,
     onItemClickListener: (() -> Unit)? = null,
 ) {
-    val modifier = if(onItemClickListener == null){
+    val modifier = if (onItemClickListener == null) {
         Modifier
     } else {
         Modifier.clickable { onItemClickListener() }
@@ -151,7 +151,7 @@ private fun PostStatistic(
         )
         Spacer(modifier = Modifier.width(4.dp))
         Image(
-            modifier  = Modifier.size(20.dp),
+            modifier = Modifier.size(20.dp),
             painter = painterResource(id = resId),
             contentDescription = null
         )

@@ -4,11 +4,11 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class StatisticElement (
+data class StatisticElement(
     val type: StatisticType,
-    val count: Long = 0
+    val count: Long = 0,
 ) : Parcelable
 
-enum class StatisticType{
+enum class StatisticType {
     VIEWS, COMMENTS, SHARES, LIKES
 }

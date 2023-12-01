@@ -35,8 +35,9 @@ fun FeedPostsScreen(
         }
         FeedPostsScreenState.Initial -> {}
         FeedPostsScreenState.Loading -> {
-            Box(modifier = Modifier
-                .fillMaxSize(),
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(color = DarkBlue)

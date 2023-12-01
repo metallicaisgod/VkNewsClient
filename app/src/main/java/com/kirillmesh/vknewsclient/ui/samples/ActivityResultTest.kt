@@ -48,7 +48,7 @@ fun ActivityResultTest() {
                 contentColor = Color.White
             ),
             onClick = { launcher.launch("image/*") }) {
-                Text(text = "Get image")
+            Text(text = "Get image")
         }
     }
 }

@@ -16,13 +16,13 @@ import com.kirillmesh.vknewsclient.R
 import com.kirillmesh.vknewsclient.ui.theme.DarkBlue
 
 @Composable
-fun LoginScreen (
-    onLoginClick: () -> Unit
+fun LoginScreen(
+    onLoginClick: () -> Unit,
 ) {
-    Box (
+    Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
-    ){
+    ) {
         Column(
             modifier = Modifier.wrapContentHeight(),
             verticalArrangement = Arrangement.Center,

@@ -11,5 +11,5 @@ data class FeedPostDto(
     @SerializedName("likes") val likes: LikesDto?,
     @SerializedName("reposts") val reposts: RepostsDto?,
     @SerializedName("views") val views: ViewsDto?,
-    @SerializedName("attachments") val attachments:List<AttachmentDto>?
+    @SerializedName("attachments") val attachments: List<AttachmentDto>?,
 )
