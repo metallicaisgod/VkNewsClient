@@ -58,4 +58,13 @@ class NewsFeedRepository(application: Application) {
         val postIndex = _feedPosts.indexOf(feedPost)
         _feedPosts[postIndex] = newPost
     }
+
+    suspend fun removePost(feedPost: FeedPost){
+        api.removePost(
+            token,
+            feedPost.communityId,
+            feedPost.id
+        )
+        _feedPosts.remove(feedPost)
+    }
 }

@@ -7,7 +7,7 @@ import retrofit2.http.Query
 
 interface ApiService {
 
-    @GET("newsfeed.get")
+    @GET("newsfeed.getRecommended")
     suspend fun loadNewsFeed(@Query("access_token") token: String): ResultDto
 
     @GET("newsfeed.get")
@@ -29,5 +29,12 @@ interface ApiService {
         @Query("owner_id") ownerId: Long,
         @Query("item_id") itemId: Long,
     ): ResponseLikesDto
+
+    @GET("newsfeed.ignoreItem?type=wall")
+    suspend fun removePost(
+        @Query("access_token") token: String,
+        @Query("owner_id") ownerId: Long,
+        @Query("item_id") itemId: Long,
+    )
 
 }

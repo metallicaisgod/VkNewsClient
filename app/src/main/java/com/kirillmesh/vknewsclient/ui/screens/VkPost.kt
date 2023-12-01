@@ -31,8 +31,6 @@ import com.kirillmesh.vknewsclient.ui.theme.RalewayFontFamily
 fun VkPostCard(
     modifier: Modifier = Modifier,
     feedPost: FeedPost,
-    onStatisticViewsClickListener: () -> Unit,
-    onStatisticSharesClickListener: () -> Unit,
     onStatisticCommentsClickListener: () -> Unit,
     onStatisticLikesClickListener: () -> Unit,
 ) {
@@ -56,8 +54,6 @@ fun VkPostCard(
             )
             Statistic(
                 statistics = feedPost.statistics,
-                onStatisticViewsClickListener = onStatisticViewsClickListener,
-                onStatisticSharesClickListener = onStatisticSharesClickListener,
                 onStatisticCommentsClickListener = onStatisticCommentsClickListener,
                 onStatisticLikesClickListener = onStatisticLikesClickListener,
                 feedPost.isLiked
@@ -69,8 +65,6 @@ fun VkPostCard(
 @Composable
 private fun Statistic(
     statistics: List<StatisticElement>,
-    onStatisticViewsClickListener: () -> Unit,
-    onStatisticSharesClickListener: () -> Unit,
     onStatisticCommentsClickListener: () -> Unit,
     onStatisticLikesClickListener: () -> Unit,
     isFavourite: Boolean
@@ -90,9 +84,7 @@ private fun Statistic(
             PostStatistic(
                 viewsElement.count,
                 R.drawable.ic_eye
-            ) {
-                onStatisticViewsClickListener()
-            }
+            )
         }
         Row(
             modifier = Modifier.weight(1f),
@@ -102,9 +94,7 @@ private fun Statistic(
             PostStatistic(
                 sharesElement.count,
                 R.drawable.ic_share
-            ) {
-                onStatisticSharesClickListener()
-            }
+            )
             val commentsElement = statistics.getElementByType(StatisticType.COMMENTS)
             PostStatistic(
                 commentsElement.count,
@@ -142,10 +132,15 @@ private fun List<StatisticElement>.getElementByType(type: StatisticType): Statis
 private fun PostStatistic(
     count: Long,
     resId: Int,
-    onItemClickListener: () -> Unit,
+    onItemClickListener: (() -> Unit)? = null,
 ) {
+    val modifier = if(onItemClickListener == null){
+        Modifier
+    } else {
+        Modifier.clickable { onItemClickListener() }
+    }
     Row(
-        modifier = Modifier.clickable { onItemClickListener() },
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(

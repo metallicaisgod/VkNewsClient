@@ -1,10 +1,12 @@
 package com.kirillmesh.vknewsclient.ui.viewmodels
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.kirillmesh.vknewsclient.data.repository.NewsFeedRepository
 import com.kirillmesh.vknewsclient.domain.FeedPost
-import com.kirillmesh.vknewsclient.domain.StatisticType
 import com.kirillmesh.vknewsclient.ui.states.FeedPostsScreenState
 import kotlinx.coroutines.launch
 
@@ -18,6 +20,7 @@ class FeedPostsViewModel(application: Application) : AndroidViewModel(applicatio
     private val repository = NewsFeedRepository(application)
 
     init {
+        _screenState.value = FeedPostsScreenState.Loading
         loadNewsFeed()
     }
 
@@ -28,7 +31,7 @@ class FeedPostsViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    fun loadNextNewsFeed(){
+    fun loadNextNewsFeed() {
         _screenState.value = FeedPostsScreenState.Posts(
             posts = repository.feedPosts,
             isNextNewsFeedLoading = true
@@ -43,35 +46,12 @@ class FeedPostsViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    fun updateStatistic(post: FeedPost, type: StatisticType) {
-
-        val currentState = _screenState.value
-        if(currentState !is FeedPostsScreenState.Posts) return
-        val modifiedList = currentState.posts.toMutableList()
-        modifiedList.replaceAll {
-            if (it == post) {
-                val newStatistics = it.statistics.toMutableList().apply {
-                    replaceAll { statisticElement ->
-                        if (statisticElement.type == type) {
-                            statisticElement.copy(count = statisticElement.count + 1)
-                        } else {
-                            statisticElement
-                        }
-                    }
-                }
-                it.copy(statistics = newStatistics)
-            } else {
-                it
-            }
-        }
-        _screenState.value = FeedPostsScreenState.Posts(modifiedList)
-    }
-
     fun removePost(post: FeedPost) {
         val currentState = _screenState.value
-        if(currentState !is FeedPostsScreenState.Posts) return
-        val modifiedList = currentState.posts.toMutableList()
-        modifiedList.remove(post)
-        _screenState.value = FeedPostsScreenState.Posts(modifiedList)
+        if (currentState !is FeedPostsScreenState.Posts) return
+        viewModelScope.launch {
+            repository.removePost(post)
+            _screenState.value = FeedPostsScreenState.Posts(repository.feedPosts)
+        }
     }
 }

@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kirillmesh.vknewsclient.domain.FeedPost
-import com.kirillmesh.vknewsclient.domain.StatisticType
 import com.kirillmesh.vknewsclient.ui.theme.DarkBlue
 import com.kirillmesh.vknewsclient.ui.viewmodels.FeedPostsViewModel
 
@@ -49,18 +48,6 @@ fun FeedPosts(
                 dismissContent = {
                     VkPostCard(
                         feedPost = feedPost,
-                        onStatisticViewsClickListener = {
-                            viewModel.updateStatistic(
-                                feedPost,
-                                StatisticType.VIEWS
-                            )
-                        },
-                        onStatisticSharesClickListener = {
-                            viewModel.updateStatistic(
-                                feedPost,
-                                StatisticType.SHARES
-                            )
-                        },
                         onStatisticCommentsClickListener = {
                             onCommentsClickListener(feedPost)
                         },
