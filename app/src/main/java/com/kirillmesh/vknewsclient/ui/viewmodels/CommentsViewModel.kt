@@ -1,33 +1,18 @@
 package com.kirillmesh.vknewsclient.ui.viewmodels
 
-import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.app.Application
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.kirillmesh.vknewsclient.data.repository.NewsFeedRepository
 import com.kirillmesh.vknewsclient.domain.FeedPost
 import com.kirillmesh.vknewsclient.ui.states.CommentsScreenState
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
 
 class CommentsViewModel(
     feedPost: FeedPost,
-    context: Context,
+    application: Application,
 ) : ViewModel() {
+    private val repository = NewsFeedRepository(application)
 
-    private val _screenState = MutableLiveData<CommentsScreenState>(CommentsScreenState.Initial)
-    val screenState: LiveData<CommentsScreenState> = _screenState
-
-    private val repository = NewsFeedRepository(context)
-
-    init {
-        loadComments(feedPost)
-    }
-
-    fun loadComments(feedPost: FeedPost) {
-        viewModelScope.launch {
-            val commentsList = repository.getComments(feedPost)
-            _screenState.value = CommentsScreenState.Comments(feedPost, commentsList)
-        }
-    }
+    val screenState = repository.getComments(feedPost)
+        .map { CommentsScreenState.Comments(feedPost, it) as CommentsScreenState }
 }

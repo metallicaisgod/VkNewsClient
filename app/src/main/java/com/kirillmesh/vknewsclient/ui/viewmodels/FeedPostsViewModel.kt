@@ -1,12 +1,14 @@
 package com.kirillmesh.vknewsclient.ui.viewmodels
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.kirillmesh.vknewsclient.data.repository.NewsFeedRepository
 import com.kirillmesh.vknewsclient.domain.FeedPost
 import com.kirillmesh.vknewsclient.extensions.mergeWith
 import com.kirillmesh.vknewsclient.ui.states.FeedPostsScreenState
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -17,11 +19,14 @@ class FeedPostsViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val repository = NewsFeedRepository(application)
     private val newsFeedFlow = repository.newsFeed
+    private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+        Log.d("FeedPostsViewModel", "Exception catched by exceptionHandler")
+    }
 
     private val loadNextDataFlow = MutableSharedFlow<FeedPostsScreenState>()
 
 
-    val screenState = repository.newsFeed
+    val screenState = newsFeedFlow
         .filter { it.isNotEmpty() }
         .map { FeedPostsScreenState.Posts(it) as FeedPostsScreenState }
         .onStart { emit(FeedPostsScreenState.Loading) }
@@ -40,13 +45,13 @@ class FeedPostsViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun changeLikesCount(feedPost: FeedPost) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             repository.changeLikesInPost(feedPost)
         }
     }
 
     fun removePost(post: FeedPost) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             repository.removePost(post)
         }
     }

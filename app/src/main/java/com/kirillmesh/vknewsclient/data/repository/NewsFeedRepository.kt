@@ -1,7 +1,6 @@
 package com.kirillmesh.vknewsclient.data.repository
 
 import android.app.Application
-import android.content.Context
 import com.kirillmesh.vknewsclient.data.network.NetworkObject
 import com.kirillmesh.vknewsclient.domain.Comment
 import com.kirillmesh.vknewsclient.domain.FeedPost
@@ -11,11 +10,13 @@ import com.kirillmesh.vknewsclient.extensions.mergeWith
 import com.kirillmesh.vknewsclient.utils.getToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
-class NewsFeedRepository(context: Context) {
+class NewsFeedRepository(application: Application) {
 
-    private val token= getToken(context as Application)
+    private val token = getToken(application)
+
 
     private val api = NetworkObject.apiService
 
@@ -39,6 +40,9 @@ class NewsFeedRepository(context: Context) {
             _feedPosts.addAll(posts)
             emit(feedPosts)
         }
+    }.retry {
+        delay(RETRY_TIMEOUT_IN_MILLIS)
+        true
     }
 
     private var _feedPosts = mutableListOf<FeedPost>()
@@ -101,13 +105,20 @@ class NewsFeedRepository(context: Context) {
         refreshDataFlow.emit(feedPosts)
     }
 
-    suspend fun getComments(feedPost: FeedPost): List<Comment> {
+    fun getComments(feedPost: FeedPost): Flow<List<Comment>> = flow {
         val commentsTemp = api.getComments(
             token = token,
             ownerId = feedPost.communityId,
             postId = feedPost.id
         ).response.mapToDomain()
         _comments.addAll(commentsTemp)
-        return comments
+        emit(comments)
+    }.retry {
+        delay(RETRY_TIMEOUT_IN_MILLIS)
+        true
+    }
+
+    companion object {
+        const val RETRY_TIMEOUT_IN_MILLIS = 3000L
     }
 }

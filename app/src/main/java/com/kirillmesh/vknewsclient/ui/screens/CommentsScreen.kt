@@ -1,5 +1,6 @@
 package com.kirillmesh.vknewsclient.ui.screens
 
+import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -30,9 +32,13 @@ fun CommentsScreen(
     feedPost: FeedPost,
 ) {
     val viewModel: CommentsViewModel = viewModel(
-        factory = CommentsViewModelFactory(feedPost = feedPost, LocalContext.current)
+        factory = CommentsViewModelFactory(
+            feedPost = feedPost,
+            LocalContext.current.applicationContext as Application
+        )
     )
-    val currentState = viewModel.screenState.value
+    val screenState = viewModel.screenState.collectAsState(initial = CommentsScreenState.Initial)
+    val currentState = screenState.value
     if (currentState is CommentsScreenState.Comments) {
         Scaffold(
             topBar = {
