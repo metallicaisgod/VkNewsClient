@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -14,14 +14,13 @@ import com.kirillmesh.vknewsclient.ui.states.FeedPostsScreenState
 import com.kirillmesh.vknewsclient.ui.theme.DarkBlue
 import com.kirillmesh.vknewsclient.ui.viewmodels.FeedPostsViewModel
 
-
 @Composable
 fun FeedPostsScreen(
     paddingValues: PaddingValues,
     onCommentsClickListener: (FeedPost) -> Unit,
 ) {
     val viewModel: FeedPostsViewModel = viewModel()
-    val screenState = viewModel.screenState.observeAsState(FeedPostsScreenState.Initial)
+    val screenState = viewModel.screenState.collectAsState(FeedPostsScreenState.Initial)
 
     when (val currentState = screenState.value) {
         is FeedPostsScreenState.Posts -> {

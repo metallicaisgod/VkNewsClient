@@ -1,12 +1,12 @@
 package com.kirillmesh.vknewsclient.ui.viewmodels
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.kirillmesh.vknewsclient.ui.states.AuthState
-import com.vk.api.sdk.VKPreferencesKeyValueStorage
-import com.vk.api.sdk.auth.VKAccessToken
+import com.kirillmesh.vknewsclient.utils.getToken
 import com.vk.api.sdk.auth.VKAuthenticationResult
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -15,9 +15,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val authState: LiveData<AuthState> = _authState
 
     init {
-        val storage = VKPreferencesKeyValueStorage(application)
-        val token = VKAccessToken.restore(storage)
-        _authState.value = if (token != null) AuthState.Authorized else AuthState.NotAuthorized
+        try {
+            getToken(application)
+            _authState.value = AuthState.Authorized
+        } catch (e: java.lang.RuntimeException) {
+            Log.d("TOKEN_FAIL", e.message.toString())
+            _authState.value = AuthState.NotAuthorized
+        }
+
     }
 
     fun performAuthorization(result: VKAuthenticationResult) {

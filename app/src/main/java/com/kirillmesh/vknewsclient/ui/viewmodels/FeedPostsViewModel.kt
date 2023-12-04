@@ -2,56 +2,52 @@ package com.kirillmesh.vknewsclient.ui.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.kirillmesh.vknewsclient.data.repository.NewsFeedRepository
 import com.kirillmesh.vknewsclient.domain.FeedPost
+import com.kirillmesh.vknewsclient.extensions.mergeWith
 import com.kirillmesh.vknewsclient.ui.states.FeedPostsScreenState
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class FeedPostsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val startState = FeedPostsScreenState.Initial
-
-    private val _screenState = MutableLiveData<FeedPostsScreenState>(startState)
-    val screenState: LiveData<FeedPostsScreenState> = _screenState
-
     private val repository = NewsFeedRepository(application)
+    private val newsFeedFlow = repository.newsFeed
 
-    init {
-        _screenState.value = FeedPostsScreenState.Loading
-        loadNewsFeed()
-    }
+    private val loadNextDataFlow = MutableSharedFlow<FeedPostsScreenState>()
 
-    private fun loadNewsFeed() {
-        viewModelScope.launch {
-            val posts = repository.loadNewsFeed()
-            _screenState.value = FeedPostsScreenState.Posts(posts)
-        }
-    }
+
+    val screenState = repository.newsFeed
+        .filter { it.isNotEmpty() }
+        .map { FeedPostsScreenState.Posts(it) as FeedPostsScreenState }
+        .onStart { emit(FeedPostsScreenState.Loading) }
+        .mergeWith(loadNextDataFlow)
 
     fun loadNextNewsFeed() {
-        _screenState.value = FeedPostsScreenState.Posts(
-            posts = repository.feedPosts,
-            isNextNewsFeedLoading = true
-        )
-        loadNewsFeed()
+        viewModelScope.launch {
+            loadNextDataFlow.emit(
+                FeedPostsScreenState.Posts(
+                    posts = newsFeedFlow.value,
+                    isNextNewsFeedLoading = true
+                )
+            )
+            repository.needNextData()
+        }
     }
 
     fun changeLikesCount(feedPost: FeedPost) {
         viewModelScope.launch {
             repository.changeLikesInPost(feedPost)
-            _screenState.value = FeedPostsScreenState.Posts(repository.feedPosts)
         }
     }
 
     fun removePost(post: FeedPost) {
-        val currentState = _screenState.value
-        if (currentState !is FeedPostsScreenState.Posts) return
         viewModelScope.launch {
             repository.removePost(post)
-            _screenState.value = FeedPostsScreenState.Posts(repository.feedPosts)
         }
     }
 }

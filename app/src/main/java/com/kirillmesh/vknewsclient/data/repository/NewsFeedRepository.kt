@@ -1,21 +1,48 @@
 package com.kirillmesh.vknewsclient.data.repository
 
+import android.app.Application
 import android.content.Context
 import com.kirillmesh.vknewsclient.data.network.NetworkObject
-import com.kirillmesh.vknewsclient.data.sharedprefs.TokenManager
 import com.kirillmesh.vknewsclient.domain.Comment
 import com.kirillmesh.vknewsclient.domain.FeedPost
 import com.kirillmesh.vknewsclient.domain.StatisticElement
 import com.kirillmesh.vknewsclient.domain.StatisticType
+import com.kirillmesh.vknewsclient.extensions.mergeWith
+import com.kirillmesh.vknewsclient.utils.getToken
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 
 class NewsFeedRepository(context: Context) {
 
-    private val token = TokenManager(context = context).getToken()
+    private val token= getToken(context as Application)
 
     private val api = NetworkObject.apiService
 
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    private val nextDataNeeded = MutableSharedFlow<Unit>(replay = 1)
+    private val refreshDataFlow = MutableSharedFlow<List<FeedPost>>()
+    private val loadedDataFlow = flow {
+        nextDataNeeded.emit(Unit)
+        nextDataNeeded.collect {
+            val startFrom = nextFrom
+            if (startFrom == null && feedPosts.isNotEmpty()) {
+                emit(feedPosts)
+            }
+            val response = if (startFrom == null) {
+                api.loadNewsFeed(token).response
+            } else {
+                api.loadNewsFeed(token, startFrom).response
+            }
+            nextFrom = response.nextFrom
+            val posts = response.mapToDomain()
+            _feedPosts.addAll(posts)
+            emit(feedPosts)
+        }
+    }
+
     private var _feedPosts = mutableListOf<FeedPost>()
-    val feedPosts: List<FeedPost>
+    private val feedPosts: List<FeedPost>
         get() = _feedPosts.toList()
 
     private var _comments = mutableListOf<Comment>()
@@ -24,18 +51,17 @@ class NewsFeedRepository(context: Context) {
 
     private var nextFrom: String? = null
 
-    suspend fun loadNewsFeed(): List<FeedPost> {
-        val startFrom = nextFrom
-        if (startFrom == null && feedPosts.isNotEmpty()) return feedPosts
-        val response = if (startFrom == null) {
-            api.loadNewsFeed(token).response
-        } else {
-            api.loadNewsFeed(token, startFrom).response
-        }
-        nextFrom = response.nextFrom
-        val posts = response.mapToDomain()
-        _feedPosts.addAll(posts)
-        return feedPosts
+    val newsFeed: StateFlow<List<FeedPost>> =
+        loadedDataFlow
+            .mergeWith(refreshDataFlow)
+            .stateIn(
+                coroutineScope,
+                started = SharingStarted.Lazily,
+                initialValue = feedPosts
+            )
+
+    suspend fun needNextData() {
+        nextDataNeeded.emit(Unit)
     }
 
     suspend fun changeLikesInPost(feedPost: FeedPost) {
@@ -62,6 +88,7 @@ class NewsFeedRepository(context: Context) {
         val newPost = feedPost.copy(statistics = newStatistics, isLiked = !feedPost.isLiked)
         val postIndex = _feedPosts.indexOf(feedPost)
         _feedPosts[postIndex] = newPost
+        refreshDataFlow.emit(feedPosts)
     }
 
     suspend fun removePost(feedPost: FeedPost) {
@@ -71,6 +98,7 @@ class NewsFeedRepository(context: Context) {
             feedPost.id
         )
         _feedPosts.remove(feedPost)
+        refreshDataFlow.emit(feedPosts)
     }
 
     suspend fun getComments(feedPost: FeedPost): List<Comment> {
