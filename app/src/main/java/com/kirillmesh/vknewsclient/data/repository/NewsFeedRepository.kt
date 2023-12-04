@@ -1,21 +1,24 @@
 package com.kirillmesh.vknewsclient.data.repository
 
 import android.app.Application
+import android.util.Log
 import com.kirillmesh.vknewsclient.data.network.NetworkObject
 import com.kirillmesh.vknewsclient.domain.Comment
 import com.kirillmesh.vknewsclient.domain.FeedPost
 import com.kirillmesh.vknewsclient.domain.StatisticElement
 import com.kirillmesh.vknewsclient.domain.StatisticType
 import com.kirillmesh.vknewsclient.extensions.mergeWith
+import com.kirillmesh.vknewsclient.ui.states.AuthState
 import com.kirillmesh.vknewsclient.utils.getToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
-class NewsFeedRepository(application: Application) {
+class NewsFeedRepository(private val application: Application) {
 
-    private val token = getToken(application)
+    private val token
+    get() = getToken(application)
 
 
     private val api = NetworkObject.apiService
@@ -64,9 +67,33 @@ class NewsFeedRepository(application: Application) {
                 initialValue = feedPosts
             )
 
+    private val checkAuthStateEvent = MutableSharedFlow<Unit>(replay = 1)
+    val authState = flow {
+        checkAuthStateEvent.emit(Unit)
+        checkAuthStateEvent.collect {
+            try {
+                getToken(application)
+                emit(AuthState.Authorized)
+            } catch (e: java.lang.RuntimeException) {
+                Log.d("TOKEN_FAIL", e.message.toString())
+                emit(AuthState.NotAuthorized)
+            }
+        }
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Lazily,
+        initialValue = AuthState.Initial
+    )
+
+    suspend fun checkAuthState(){
+        checkAuthStateEvent.emit(Unit)
+    }
+
     suspend fun needNextData() {
         nextDataNeeded.emit(Unit)
     }
+
+
 
     suspend fun changeLikesInPost(feedPost: FeedPost) {
 
