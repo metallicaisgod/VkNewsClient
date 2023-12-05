@@ -1,9 +1,9 @@
 package com.kirillmesh.vknewsclient.data.model
 
 import com.google.gson.annotations.SerializedName
-import com.kirillmesh.vknewsclient.domain.FeedPost
-import com.kirillmesh.vknewsclient.domain.StatisticElement
-import com.kirillmesh.vknewsclient.domain.StatisticType
+import com.kirillmesh.vknewsclient.domain.entities.FeedPost
+import com.kirillmesh.vknewsclient.domain.entities.StatisticElement
+import com.kirillmesh.vknewsclient.domain.entities.StatisticType
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.absoluteValue

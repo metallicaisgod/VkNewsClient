@@ -1,7 +1,7 @@
 package com.kirillmesh.vknewsclient.data.model
 
 import com.google.gson.annotations.SerializedName
-import com.kirillmesh.vknewsclient.domain.Comment
+import com.kirillmesh.vknewsclient.domain.entities.Comment
 
 data class CommentsResponseDto(
     @SerializedName("items") val comments: List<CommentDto>,

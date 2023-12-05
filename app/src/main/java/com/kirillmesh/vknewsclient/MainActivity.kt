@@ -7,12 +7,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.kirillmesh.vknewsclient.ui.screens.LoginScreen
-import com.kirillmesh.vknewsclient.ui.screens.MainScreen
-import com.kirillmesh.vknewsclient.ui.screens.SetStatusBarColor
-import com.kirillmesh.vknewsclient.ui.states.AuthState
-import com.kirillmesh.vknewsclient.ui.theme.VkNewsClientTheme
-import com.kirillmesh.vknewsclient.ui.viewmodels.MainViewModel
+import com.kirillmesh.vknewsclient.presentation.screens.LoginScreen
+import com.kirillmesh.vknewsclient.presentation.screens.MainScreen
+import com.kirillmesh.vknewsclient.presentation.screens.SetStatusBarColor
+import com.kirillmesh.vknewsclient.domain.entities.AuthState
+import com.kirillmesh.vknewsclient.presentation.theme.VkNewsClientTheme
+import com.kirillmesh.vknewsclient.presentation.viewmodels.MainViewModel
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.auth.VKScope
 
