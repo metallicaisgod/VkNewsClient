@@ -1,6 +1,5 @@
 package com.kirillmesh.vknewsclient.presentation.screens
 
-import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,10 +8,10 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,22 +21,35 @@ import coil.compose.AsyncImage
 import com.kirillmesh.vknewsclient.R
 import com.kirillmesh.vknewsclient.domain.entities.Comment
 import com.kirillmesh.vknewsclient.domain.entities.FeedPost
+import com.kirillmesh.vknewsclient.presentation.getApplicationComponent
 import com.kirillmesh.vknewsclient.presentation.states.CommentsScreenState
 import com.kirillmesh.vknewsclient.presentation.viewmodels.CommentsViewModel
-import com.kirillmesh.vknewsclient.presentation.viewmodels.CommentsViewModelFactory
 
 @Composable
 fun CommentsScreen(
     onBackPressedListener: () -> Unit,
     feedPost: FeedPost,
 ) {
+    val component = getApplicationComponent()
+        .getCommentsScreenComponentFactory()
+        .create(feedPost)
+
     val viewModel: CommentsViewModel = viewModel(
-        factory = CommentsViewModelFactory(
-            feedPost = feedPost,
-            LocalContext.current.applicationContext as Application
-        )
+        factory = component.getViewModelFactory()
     )
     val screenState = viewModel.screenState.collectAsState(initial = CommentsScreenState.Initial)
+
+    CommentsScreenContent(
+        screenState = screenState,
+        onBackPressedListener = onBackPressedListener
+    )
+}
+
+@Composable
+fun CommentsScreenContent(
+    screenState: State<CommentsScreenState>,
+    onBackPressedListener: () -> Unit,
+) {
     val currentState = screenState.value
     if (currentState is CommentsScreenState.Comments) {
         Scaffold(

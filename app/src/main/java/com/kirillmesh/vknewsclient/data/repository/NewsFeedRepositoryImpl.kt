@@ -1,28 +1,24 @@
 package com.kirillmesh.vknewsclient.data.repository
 
-import android.app.Application
-import android.util.Log
-import com.kirillmesh.vknewsclient.data.network.NetworkObject
-import com.kirillmesh.vknewsclient.domain.entities.Comment
-import com.kirillmesh.vknewsclient.domain.entities.FeedPost
-import com.kirillmesh.vknewsclient.domain.entities.StatisticElement
-import com.kirillmesh.vknewsclient.domain.entities.StatisticType
-import com.kirillmesh.vknewsclient.extensions.mergeWith
-import com.kirillmesh.vknewsclient.domain.entities.AuthState
+import com.kirillmesh.vknewsclient.data.network.ApiService
+import com.kirillmesh.vknewsclient.domain.entities.*
 import com.kirillmesh.vknewsclient.domain.repository.NewsFeedRepository
-import com.kirillmesh.vknewsclient.utils.getToken
+import com.kirillmesh.vknewsclient.extensions.mergeWith
+import com.vk.api.sdk.VKPreferencesKeyValueStorage
+import com.vk.api.sdk.auth.VKAccessToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
-class NewsFeedRepositoryImpl(private val application: Application) : NewsFeedRepository {
+class NewsFeedRepositoryImpl @Inject constructor(
+    private val api: ApiService,
+    private val storage: VKPreferencesKeyValueStorage,
+) : NewsFeedRepository {
 
-    private val token
-    get() = getToken(application)
-
-
-    private val api = NetworkObject.apiService
+    private val vkToken
+        get() = VKAccessToken.restore(storage)
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val nextDataNeeded = MutableSharedFlow<Unit>(replay = 1)
@@ -35,9 +31,9 @@ class NewsFeedRepositoryImpl(private val application: Application) : NewsFeedRep
                 emit(feedPosts)
             }
             val response = if (startFrom == null) {
-                api.loadNewsFeed(token).response
+                api.loadNewsFeed(getAccessToken()).response
             } else {
-                api.loadNewsFeed(token, startFrom).response
+                api.loadNewsFeed(getAccessToken(), startFrom).response
             }
             nextFrom = response.nextFrom
             val posts = response.mapToDomain()
@@ -52,10 +48,6 @@ class NewsFeedRepositoryImpl(private val application: Application) : NewsFeedRep
     private var _feedPosts = mutableListOf<FeedPost>()
     private val feedPosts: List<FeedPost>
         get() = _feedPosts.toList()
-
-    private var _comments = mutableListOf<Comment>()
-    val comments: List<Comment>
-        get() = _comments.toList()
 
     private var nextFrom: String? = null
 
@@ -72,13 +64,10 @@ class NewsFeedRepositoryImpl(private val application: Application) : NewsFeedRep
     private val authStateFlow = flow {
         checkAuthStateEvent.emit(Unit)
         checkAuthStateEvent.collect {
-            try {
-                getToken(application)
-                emit(AuthState.Authorized)
-            } catch (e: java.lang.RuntimeException) {
-                Log.d("TOKEN_FAIL", e.message.toString())
-                emit(AuthState.NotAuthorized)
-            }
+            val currentToken = vkToken
+            val loggedIn = currentToken != null && currentToken.isValid
+            val authState = if (loggedIn) AuthState.Authorized else AuthState.NotAuthorized
+            emit(authState)
         }
     }.stateIn(
         scope = coroutineScope,
@@ -86,7 +75,7 @@ class NewsFeedRepositoryImpl(private val application: Application) : NewsFeedRep
         initialValue = AuthState.Initial
     )
 
-    override suspend fun checkAuthState(){
+    override suspend fun checkAuthState() {
         checkAuthStateEvent.emit(Unit)
     }
 
@@ -95,18 +84,17 @@ class NewsFeedRepositoryImpl(private val application: Application) : NewsFeedRep
     }
 
 
-
     override suspend fun changeLikesInPost(feedPost: FeedPost) {
 
         val response = if (!feedPost.isLiked) {
             api.addLike(
-                token,
+                getAccessToken(),
                 feedPost.communityId,
                 feedPost.id
             )
         } else {
             api.deleteLike(
-                token,
+                getAccessToken(),
                 feedPost.communityId,
                 feedPost.id
             )
@@ -125,7 +113,7 @@ class NewsFeedRepositoryImpl(private val application: Application) : NewsFeedRep
 
     override suspend fun removePost(feedPost: FeedPost) {
         api.removePost(
-            token,
+            getAccessToken(),
             feedPost.communityId,
             feedPost.id
         )
@@ -135,16 +123,15 @@ class NewsFeedRepositoryImpl(private val application: Application) : NewsFeedRep
 
     override fun getNewsFeed(): StateFlow<List<FeedPost>> = newsFeedFlow
 
-    override fun getAuthState(): StateFlow<AuthState>  = authStateFlow
+    override fun getAuthState(): StateFlow<AuthState> = authStateFlow
 
     override fun getComments(feedPost: FeedPost): StateFlow<List<Comment>> = flow {
         val commentsTemp = api.getComments(
-            token = token,
+            token = getAccessToken(),
             ownerId = feedPost.communityId,
             postId = feedPost.id
         ).response.mapToDomain()
-        _comments.addAll(commentsTemp)
-        emit(comments)
+        emit(commentsTemp)
     }.retry {
         delay(RETRY_TIMEOUT_IN_MILLIS)
         true
@@ -153,6 +140,10 @@ class NewsFeedRepositoryImpl(private val application: Application) : NewsFeedRep
         SharingStarted.Lazily,
         listOf()
     )
+
+    private fun getAccessToken(): String {
+        return vkToken?.accessToken ?: throw IllegalStateException("Token is null")
+    }
 
     companion object {
         const val RETRY_TIMEOUT_IN_MILLIS = 3000L

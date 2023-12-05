@@ -1,10 +1,8 @@
 package com.kirillmesh.vknewsclient.presentation.viewmodels
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kirillmesh.vknewsclient.data.repository.NewsFeedRepositoryImpl
 import com.kirillmesh.vknewsclient.domain.entities.FeedPost
 import com.kirillmesh.vknewsclient.domain.usecases.ChangeLikesUseCase
 import com.kirillmesh.vknewsclient.domain.usecases.GetNewsFeedUseCase
@@ -18,15 +16,14 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class FeedPostsViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = NewsFeedRepositoryImpl(application)
-
-    private val getNewsFeedUseCase =  GetNewsFeedUseCase(repository)
-    private val needNextDataUseCase = NeedNextDataUseCase(repository)
-    private val changeLikesUseCase = ChangeLikesUseCase(repository)
-    private val removePostUseCase = RemovePostUseCase(repository)
+class FeedPostsViewModel @Inject constructor(
+    getNewsFeedUseCase: GetNewsFeedUseCase,
+    private val needNextDataUseCase: NeedNextDataUseCase,
+    private val changeLikesUseCase: ChangeLikesUseCase,
+    private val removePostUseCase: RemovePostUseCase,
+) : ViewModel() {
 
     private val newsFeedFlow = getNewsFeedUseCase()
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->

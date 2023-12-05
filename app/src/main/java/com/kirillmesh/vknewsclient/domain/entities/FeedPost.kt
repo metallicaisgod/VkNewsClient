@@ -3,10 +3,12 @@ package com.kirillmesh.vknewsclient.domain.entities
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import androidx.navigation.NavType
 import com.google.gson.Gson
 import kotlinx.parcelize.Parcelize
 
+@Immutable
 @Parcelize
 data class FeedPost(
     val id: Long,
